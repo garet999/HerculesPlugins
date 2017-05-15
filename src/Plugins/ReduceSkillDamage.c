@@ -102,11 +102,14 @@ int64 battle_calc_damage_post(int64 final_damage, struct block_list *src, struct
 	int i;
 	s_sd = BL_CAST(BL_PC, src);
 	t_sd = BL_CAST(BL_PC, bl);
-	data = bonus_search(t_sd);
-	for (i = 0; i < MAX_BONUS_SKILL_LEVELS; i++) {
-		if (data->bReduceSkillDamage[i].skill_id == skill_id) {
-			final_damage = (int64)(final_damage * ((100 - data->bReduceSkillDamage[i].reduction) / 100.0f));
-			break;
+	if (bl->type == BL_PC) {
+		data = bonus_search(t_sd);
+		for (i = 0; i < MAX_BONUS_SKILL_LEVELS; i++) {
+			if (data->bReduceSkillDamage[i].skill_id == skill_id) {
+				final_damage = (int64)(final_damage * ((100 - data->bReduceSkillDamage[i].reduction) / 100.0f));
+				final_damage = (int64)(final_damage * ((100 - data->bReduceSkillDamage[i].reduction) / 100.0f));
+				break;
+			}
 		}
 	}
 	return final_damage;
