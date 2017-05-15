@@ -107,7 +107,6 @@ int64 battle_calc_damage_post(int64 final_damage, struct block_list *src, struct
 		for (i = 0; i < MAX_BONUS_SKILL_LEVELS; i++) {
 			if (data->bReduceSkillDamage[i].skill_id == skill_id) {
 				final_damage = (int64)(final_damage * ((100 - data->bReduceSkillDamage[i].reduction) / 100.0f));
-				final_damage = (int64)(final_damage * ((100 - data->bReduceSkillDamage[i].reduction) / 100.0f));
 				break;
 			}
 		}
