@@ -8,7 +8,7 @@
 //= bReduceSkillDamage Reduces Skill x's incoming damage by y%
 //===== Additional Comments: =================================
 //= Format:
-//= bonus bReduceSkillDamage x,y;	// x = skill id, y = %
+//= bonus2 bReduceSkillDamage x,y;	// x = skill id, y = %
 //===== Repo Link: ===========================================
 //= https://github.com/garet999/HerculesPlugins
 //============================================================
@@ -97,10 +97,9 @@ int pc_bonus2_pre(struct map_session_data **sd, int *type, int *type2, int *val)
 }
 
 int64 battle_calc_damage_post(int64 final_damage, struct block_list *src, struct block_list *bl, struct Damage *d, int64 damage, uint16 skill_id, uint16 skill_lv) {
-	struct map_session_data *s_sd, *t_sd;
+	struct map_session_data *t_sd;
 	struct s_bonus_data *data;
 	int i;
-	s_sd = BL_CAST(BL_PC, src);
 	t_sd = BL_CAST(BL_PC, bl);
 	if (bl->type == BL_PC) {
 		data = bonus_search(t_sd);
