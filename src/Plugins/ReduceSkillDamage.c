@@ -36,10 +36,10 @@
 HPExport struct hplugin_info pinfo = {
 	"Reduce Skill damage",
 	SERVER_TYPE_MAP,
-	"1.0",
+	"1.1",
 	HPM_VERSION,
 };
-#define MAX_BONUS_SKILL_LEVELS 10
+#define MAX_BONUS_AMOUNT 10
 /**
 * Bonus ID.
 * don't mess with this.
@@ -51,7 +51,7 @@ struct reduceSkillDamage {
 	uint16 reduction;
 };
 struct s_bonus_data {
-	struct reduceSkillDamage bReduceSkillDamage[MAX_BONUS_SKILL_LEVELS];
+	struct reduceSkillDamage bReduceSkillDamage[MAX_BONUS_AMOUNT];
 };
 
 // If data is not found, set to null
@@ -81,15 +81,15 @@ int pc_bonus2_pre(struct map_session_data **sd, int *type, int *type2, int *val)
 	int i;
 	if (*type == bReduceSkillDamage) {
 		// Find free Slot
-		for (i = 0; i < MAX_BONUS_SKILL_LEVELS; i++) {
-			if (data->bReduceSkillDamage[i].skill_id == 0 || data->bReduceSkillDamage[i].reduction == 0) {
+		for (i = 0; i < MAX_BONUS_AMOUNT; i++) {
+			if (data->bReduceSkillDamage[i].skill_id == 0 || data->bReduceSkillDamage[i].skill_id == *type2) {
 				data->bReduceSkillDamage[i].skill_id = *type2;
-				data->bReduceSkillDamage[i].reduction = *val;
+				data->bReduceSkillDamage[i].reduction = (data->bReduceSkillDamage[i].skill_id == *type2)? *val + data->bReduceSkillDamage[i].reduction : *val;
 				break;
 			}
 		}
-		if (i == MAX_BONUS_SKILL_LEVELS) {
-			ShowError("pc_bonus2_pre: bBonusSkillLevel Reached %d Slots. No more Free slots for Player.", MAX_BONUS_SKILL_LEVELS);
+		if (i == MAX_BONUS_AMOUNT) {
+			ShowError("pc_bonus2_pre: bBonusSkillLevel Reached %d Slots. No more Free slots for Player.", MAX_BONUS_AMOUNT);
 		}
 		hookStop();
 	}
@@ -103,7 +103,7 @@ int64 battle_calc_damage_post(int64 final_damage, struct block_list *src, struct
 	t_sd = BL_CAST(BL_PC, bl);
 	if (bl->type == BL_PC) {
 		data = bonus_search(t_sd);
-		for (i = 0; i < MAX_BONUS_SKILL_LEVELS; i++) {
+		for (i = 0; i < MAX_BONUS_AMOUNT; i++) {
 			if (data->bReduceSkillDamage[i].skill_id == skill_id) {
 				final_damage = (int64)(final_damage * ((100 - data->bReduceSkillDamage[i].reduction) / 100.0f));
 				break;
