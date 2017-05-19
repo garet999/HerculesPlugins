@@ -3,7 +3,6 @@
 #include "common/mmo.h"
 #include "common/socket.h"
 #include "common/strlib.h"
-#include "map/mob.h"
 #include "map/script.h"
 #include "map/battle.h"
 #include "map/pc.h"
