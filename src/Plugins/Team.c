@@ -1,15 +1,16 @@
-#include "common/hercules.h" /* Should always be the first Hercules file included! (if you don't make it first, you won't be able to use interfaces) */
+#include "common/hercules.h"
 #include "common/memmgr.h"
 #include "common/mmo.h"
 #include "common/socket.h"
 #include "common/strlib.h"
 #include "map/script.h"
 #include "map/battle.h"
+#include "map/clif.h"
 #include "map/pc.h"
 #include "common/nullpo.h"
 
 #include "plugins/HPMHooking.h"
-#include "common/HPMDataCheck.h" /* should always be the last Hercules file included! (if you don't make it last, it'll intentionally break compile time) */
+#include "common/HPMDataCheck.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,7 +19,7 @@
 HPExport struct hplugin_info pinfo = {
 	"Team script command",    // Plugin name
 	SERVER_TYPE_MAP,// Which server types this plugin works with?
-	"1.0",       // Plugin version
+	"1.1",       // Plugin version
 	HPM_VERSION, // HPM Version (don't change, macro is automatically updated)
 };
 
@@ -57,6 +58,14 @@ int battle_check_target_pre(struct block_list **src, struct block_list **target,
 	}
 	return 0;
 }
+void clif_getareachar_pc_post(struct map_session_data* sd, struct map_session_data* dstsd) {
+	struct s_bonus_data *sddata, *tsddata;
+	sddata = bonus_search(sd);
+	tsddata = bonus_search(dstsd);
+	if (sddata->teamId == tsddata->teamId && sddata->teamId != 0)
+		clif->hpmeter_single(sd->fd, dstsd->bl.id, dstsd->battle_status.hp, dstsd->battle_status.max_hp);
+}
+
 /**
 * Adds a built-in script function.
 *
@@ -82,6 +91,7 @@ BUILDIN(leaveteam) {
 
 HPExport void plugin_init(void) {
 	addHookPre(battle,check_target,battle_check_target_pre);
+	addHookPost(clif,getareachar_pc,clif_getareachar_pc_post);
 	addScriptCommand("jointeam", "i", jointeam);
 	addScriptCommand("leaveteam", "", leaveteam);
 }
